@@ -13,29 +13,31 @@
   by Scott Fitzgerald
  */
 
- #include "FastLED.h"
-#define NUM_LEDS 60
+#include "FastLED.h"
 
+#define NUM_LEDS 60
 #define DATA_PIN1 53
 #define DATA_PIN2 51
 #define DATA_PIN3 49
-
 #define CLOCK_PIN 13
 
-CRGB leds1[NUM_LEDS];
-CRGB leds2[NUM_LEDS];
-CRGB leds3[NUM_LEDS];
+CRGB temperature[NUM_LEDS];
+CRGB windSpeed[NUM_LEDS];
+CRGB forecast[NUM_LEDS];
+
+// function prototypes
+void setTemperature(double, CRGB[]);
 
 // the setup function runs once when you press reset or power the board
 void setup() {
-  FastLED.addLeds<WS2812B, DATA_PIN1>(leds1, NUM_LEDS);
-  FastLED.addLeds<WS2812B, DATA_PIN2>(leds2, NUM_LEDS);
-  FastLED.addLeds<WS2812B, DATA_PIN3>(leds3, NUM_LEDS);
+  FastLED.addLeds<NEOPIXEL, DATA_PIN1>(temperature, NUM_LEDS);
+  FastLED.addLeds<NEOPIXEL, DATA_PIN2>(windSpeed, NUM_LEDS);
+  FastLED.addLeds<NEOPIXEL, DATA_PIN3>(forecast, NUM_LEDS);
 }
 
 // the loop function runs over and over again forever
 void loop() {
-  leds1[0] = CRGB::Black;
+ /* leds1[0] = CRGB::Black;
   leds2[0] = CRGB::Black;
   leds3[0] = CRGB::Black;
   
@@ -51,6 +53,47 @@ void loop() {
       leds3[i] = CRGB::Black;
       FastLED.show();
       delay(10);
-  }
-  
+  }*/
+
+  //temperature
+  setTemperature(110);
 }
+
+void setTemperature(double temp){
+  int maxTemp = 110;
+  int minTemp = -10;
+  int ledsToLight = 0;
+  int stepSize = (maxTemp - minTemp) / NUM_LEDS;
+
+  if (temp >= maxTemp) {
+    ledsToLight = NUM_LEDS;
+  } else if(temp < minTemp) {
+    ledsToLight = 0;
+  } else {
+    ledsToLight = temp / stepSize;
+  }
+
+  for (int i = 0; i < NUM_LEDS; i++) {
+    temperature[i] = CRGB::Black;
+    if (i <= ledsToLight) {
+      temperature[i] = CRGB::Green;
+      windSpeed[i] = CRGB::Green;
+      forecast[i] = CRGB::Green;
+      FastLED.show();
+      delay(1);
+      temperature[i] = CRGB::Blue;
+      windSpeed[i] = CRGB::Blue;
+      forecast[i] = CRGB::Blue;
+      FastLED.show();
+      delay(1);
+      temperature[i] = CRGB::Red;
+      windSpeed[i] = CRGB::Red;
+      forecast[i] = CRGB::Red;
+      FastLED.show();
+    }
+  }
+
+  FastLED.show();
+}
+
+
