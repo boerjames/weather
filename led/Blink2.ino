@@ -37,24 +37,6 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
- /* leds1[0] = CRGB::Black;
-  leds2[0] = CRGB::Black;
-  leds3[0] = CRGB::Black;
-  
-  FastLED.show();
-  for(int i=1; i<NUM_LEDS; i++){
-      leds1[i] = CRGB::Red;
-      leds2[i] = CRGB::Blue;
-      leds3[i] = CRGB::Green;
-      FastLED.show();
-      delay(10);
-      leds1[i] = CRGB::Black;
-      leds2[i] = CRGB::Black;
-      leds3[i] = CRGB::Black;
-      FastLED.show();
-      delay(10);
-  }*/
-
   //temperature
   setTemperature(110);
 }
@@ -64,6 +46,10 @@ void setTemperature(double temp){
   int minTemp = -10;
   int ledsToLight = 0;
   int stepSize = (maxTemp - minTemp) / NUM_LEDS;
+
+  double hotThreshold = 0.75;
+  double warmThreshold = 0.5;
+  double coolThreshold = 0.25;
 
   if (temp >= maxTemp) {
     ledsToLight = NUM_LEDS;
@@ -76,24 +62,33 @@ void setTemperature(double temp){
   for (int i = 0; i < NUM_LEDS; i++) {
     temperature[i] = CRGB::Black;
     if (i <= ledsToLight) {
-      temperature[i] = CRGB::Green;
-      windSpeed[i] = CRGB::Green;
-      forecast[i] = CRGB::Green;
-      FastLED.show();
-      delay(1);
-      temperature[i] = CRGB::Blue;
-      windSpeed[i] = CRGB::Blue;
-      forecast[i] = CRGB::Blue;
-      FastLED.show();
-      delay(1);
-      temperature[i] = CRGB::Red;
-      windSpeed[i] = CRGB::Red;
-      forecast[i] = CRGB::Red;
-      FastLED.show();
+      if(i / NUM_LEDS >= hotThreshold){
+        temperature[i] = CRGB::Crimson;
+      } else if (i/NUM_LEDS >= warmThreshold){
+        temperature[i] = CRGB::MediumVioletRed;
+      } else if (i/NUM_LEDS >= coolThreshold){
+        temperature[i] = CRGB::LightBlue;
+      } else {
+        temperature[i] = CRGB::MidnightBlue;
+      }
     }
   }
-
   FastLED.show();
+}
+
+void setWindSpeed(double wSpeed){
+  for(int i=0; i< NUM_LEDS; i++){
+    windSpeed[i] = CRGB::LightGoldenrodYellow;
+  }
+  FastLED.show();
+
+  for(int i=0;i<NUM_LEDS;i++){
+    windSpeed[i] = CRGB::MidnightBlue;
+    FastLED.show();
+    delay((int) 250/wSpeed);
+    windSpeed[i] = CRGB::LightGoldenrodYellow;
+    FastLED.show();
+  }
 }
 
 
