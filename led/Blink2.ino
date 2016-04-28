@@ -38,7 +38,9 @@ void setup() {
 // the loop function runs over and over again forever
 void loop() {
   //temperature
-  setTemperature(110);
+  setTemperature(110); //degrees Farenheit
+  setWindSpeed(40); //miles per hour
+  setSolidColor(0); //setting a solid color
 }
 
 void setTemperature(double temp){
@@ -89,6 +91,48 @@ void setWindSpeed(double wSpeed){
     windSpeed[i] = CRGB::LightGoldenrodYellow;
     FastLED.show();
   }
+}
+
+void setSolidColor(int num){
+  for(int i=0; i<NUM_LEDS;i++){
+  switch(num){
+    case 0:
+      forecast[i] = CRGB::Red;
+      break;
+    case 1:
+      forecast[i] = CRGB::Blue;
+      break;
+    case 2:
+      forecast[i] = CRGB::Green;
+      break;
+    case 3:
+      forecast[i] = CRGB::LightGoldenrodYellow;
+      break;
+    case 4:
+      forecast[i] = CRGB::MidnightBlue;
+      break;
+    case 5:
+      forecast[i] = CRGB::MediumVioletRed;
+      break;
+    case 6:
+      forecast[i] = CRGB::LightBlue;
+      break;
+    case 7:
+      forecast[i] = CRGB::Crimson;
+      break;
+    case 8:
+      forecast[i] = CRGB::Purple;
+      break;
+    case 9:
+      forecast[i] = CRGB::Orange;
+      break;
+    default:
+      forecast[i] = CRGB::Black;
+      break;
+  }
+  }
+  FastLED.show();
+  
 }
 
 
