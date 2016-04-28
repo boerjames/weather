@@ -6,7 +6,7 @@ A weather center for BBB
 Run Blink2.ino on the arduino.
 
 ### beaglebone - web server
-Run proj.html.
+Run proj.html on the beaglebone.
 
 ### the LED strip lighting code is derived form here
 https://github.com/FastLED/FastLED
