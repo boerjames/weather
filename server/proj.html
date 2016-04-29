@@ -1,0 +1,160 @@
+<HTML>
+
+<style>
+
+html,
+body {
+	margin:0;
+	padding:0;
+	height:100%;
+}
+#wrapper {
+	min-height:100%;
+	position:relative;
+}
+#header {
+	background:#ededed;
+	padding:10px;
+}
+#content {
+	padding-bottom:100px; /* Height of the footer element */
+}
+#footer {
+	background:#ffab62;
+	width:100%;
+	height:100px;
+	position:absolute;
+	bottom:0;
+	left:0;
+}
+
+
+#footer {
+    position: relative;
+    margin-top: -180px; /* negative value of footer height */
+   
+    clear: both;
+}
+
+#header {
+    background-color:#7f8c8d;
+    color:white;
+    text-align:center;
+    padding:5px;
+}
+#nav {
+    line-height:30px;
+    background-color:#95a5a6;
+    height: 50%;
+    width:15%;
+    float:left;
+    padding:5px; 
+}
+#section {
+    
+    width:70%;
+    float:left;
+    padding:10px; 
+}
+#footer {
+    background-color:#7f8c8d;
+    color:white;
+    clear:both;
+    text-align:center;
+}
+
+
+
+</style>
+
+
+<TITLE>Cloud Clouds Controller</TITLE>
+
+<BODY bgcolor="#E6E6FA">
+  
+
+<div id="header">
+<h1>Cloud Cloud Controller</h1>
+</div>
+
+<div id="nav">
+<br>
+<input id="clickme" type="button" value="Reset Cloud Cloud" onclick="reset();" />
+<br>
+<input id="clickme" type="button" value="Celcius/Fahrenheit" onclick="cf();" />
+<br>
+<input id="clickme" type="button" value="Toggle Windspeed" onclick="wind();" />
+<br>
+</div>
+
+
+<script src="/socket.io/socket.io.js"></script>
+
+
+<div id="section">
+<h1>Select a location</h1>
+<div id="map" style="width:75%; height:25%;"></div>
+
+
+
+
+<script src = "/socket.io/socket.io.js" > </script>
+
+<script type=text/javascript src="http://code.jquery.com/jquery-1.7.1.min.js">
+</script>
+
+<script>
+
+  var map;
+  console.log("Attempting to connect");
+  var socket = io();
+  
+  
+  function reset(){
+      console.log("Emmiting Reset");
+      socket.emit('Btn', 0);
+  }
+  function cf(){
+      console.log("Emmiting Change Temp");
+      socket.emit('Btn', 1);
+  }
+  function wind(){
+      console.log("Emmiting Wind");
+      socket.emit('Btn', 2);
+  }
+
+
+  
+  
+  
+  function initMap() {
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: {lat: 36.0, lng: -100},
+      zoom: 4,
+      disableDefaultUI: true
+    });
+      google.maps.event.addListener(map, "rightclick", function(event) {
+      
+      var lat = event.latLng.lat();
+      var lng = event.latLng.lng();
+      
+      var ltlg = {lat: event.latLng.lat(), lng: event.latLng.lng()};
+
+      socket.emit('LatLng', ltlg);
+      });
+    }
+    console.log("Still working again");
+    
+      
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDxol9EG97b0_BQ8fHRhFWnt_DnSQl4N9s&callback=initMap"
+    async defer>
+</script>
+
+</Body>
+
+
+
+
+</HTML>
