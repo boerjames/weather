@@ -1,57 +1,63 @@
 /*
-  Blink
-  Turns on an LED on for one second, then off for one second, repeatedly.
+  LED controlling program
+  Weather Project
+  Embedded Systems  |  Dr. Paul Grabow, S16
 
-  Most Arduinos have an on-board LED you can control. On the Uno and
-  Leonardo, it is attached to digital pin 13. If you're unsure what
-  pin the on-board LED is connected to on your Arduino model, check
-  the documentation at http://www.arduino.cc
+  Authors:  James Boer
+            Matt Santiago
+            Kyle Unruh
+*/
 
-  This example code is in the public domain.
-
-  modified 8 May 2014
-  by Scott Fitzgerald
- */
-
+//Pull in FastLED library for led addressing and control
 #include "FastLED.h"
 
+//Constants
 #define NUM_LEDS 60
 #define DATA_PIN1 53
 #define DATA_PIN2 51
 #define DATA_PIN3 49
 #define CLOCK_PIN 13
 
-CRGB temperature[NUM_LEDS];
-CRGB windSpeed[NUM_LEDS];
-CRGB forecast[NUM_LEDS];
+CRGB temperature[NUM_LEDS]; //temperature strip
+CRGB windSpeed[NUM_LEDS];   //wind speed strip
+CRGB forecast[NUM_LEDS];    //forecast strip
 
-// function prototypes
-void setTemperature(double, CRGB[]);
-
-// the setup function runs once when you press reset or power the board
 void setup() {
+  //Initialization
   FastLED.addLeds<NEOPIXEL, DATA_PIN1>(temperature, NUM_LEDS);
-  FastLED.addLeds<NEOPIXEL, DATA_PIN2>(windSpeed, NUM_LEDS);
-  FastLED.addLeds<NEOPIXEL, DATA_PIN3>(forecast, NUM_LEDS);
+  FastLED.addLeds<NEOPIXEL, DATA_PIN2>(forecast, NUM_LEDS);
+  setSolidColor(-1);
+  Serial.begin(9600);
 }
 
 // the loop function runs over and over again forever
 void loop() {
-  //temperature
-  setTemperature(110); //degrees Farenheit
-  setWindSpeed(40); //miles per hour
-  setSolidColor(0); //setting a solid color
+  //Loop through the states of solid colors
+  //Show progression along temperature strip
+  for (int i = 0; i < 10; i++) {
+    setSolidColor(i);
+    for (double j = -10; j < 111; j+=0.1) {
+      setTemperature(j);
+      delay(10);
+    }
+  }
 }
 
+
+//Lights a section of the led strip proportional to the temperature
+//Simulates a mercury thermometer
+//As temperature increases, more LEDs are illuminated
 void setTemperature(double temp){
   int maxTemp = 110;
   int minTemp = -10;
-  int ledsToLight = 0;
-  int stepSize = (maxTemp - minTemp) / NUM_LEDS;
+  int range = maxTemp - minTemp;
+  double ledsToLight = 0;
+  double stepSize = range / NUM_LEDS;
 
-  double hotThreshold = 0.75;
-  double warmThreshold = 0.5;
-  double coolThreshold = 0.25;
+  double colorStep = 255 / range;
+  int red = temp * colorStep;
+  int blue = 255 - red;
+  CRGB color = CRGB(red, 0, blue);
 
   if (temp >= maxTemp) {
     ledsToLight = NUM_LEDS;
@@ -59,25 +65,20 @@ void setTemperature(double temp){
     ledsToLight = 0;
   } else {
     ledsToLight = temp / stepSize;
+    Serial.print(ledsToLight);
   }
 
   for (int i = 0; i < NUM_LEDS; i++) {
     temperature[i] = CRGB::Black;
     if (i <= ledsToLight) {
-      if(i / NUM_LEDS >= hotThreshold){
-        temperature[i] = CRGB::Crimson;
-      } else if (i/NUM_LEDS >= warmThreshold){
-        temperature[i] = CRGB::MediumVioletRed;
-      } else if (i/NUM_LEDS >= coolThreshold){
-        temperature[i] = CRGB::LightBlue;
-      } else {
-        temperature[i] = CRGB::MidnightBlue;
-      }
+      temperature[i] = color;
     }
   }
   FastLED.show();
 }
 
+//Simulates a wind speed by propogating an LED with
+//varying delays
 void setWindSpeed(double wSpeed){
   for(int i=0; i< NUM_LEDS; i++){
     windSpeed[i] = CRGB::LightGoldenrodYellow;
@@ -93,6 +94,7 @@ void setWindSpeed(double wSpeed){
   }
 }
 
+//Sets the forecast strip to a single solid color
 void setSolidColor(int num){
   for(int i=0; i<NUM_LEDS;i++){
   switch(num){
@@ -132,7 +134,4 @@ void setSolidColor(int num){
   }
   }
   FastLED.show();
-  
 }
-
-
