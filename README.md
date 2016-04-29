@@ -1,5 +1,5 @@
 # weather
-A weather center for BBB
+A weather center for BBB and Arduino
 
 ## getting it to run
 ### arduino - led controller

@@ -5,20 +5,20 @@ var fs = require('fs');
 
 app.listen(8085);
 
-var htmlPage = 'index.html'; // Debian
-var soc;
-var currentWeather = 'Startup';
-var lastQuery;
-var tMode = true;
-var repeatTime = 60000;
+
+var htmlPage = 'index.html'; 	// Debian
+var soc; 			// Communication between server and client
+var currentWeather = 'Startup'; // Used to control LEDs, default state is all lights off
+var lastQuery; 			// Allow for repeated wunderground calls without regenerating queries
+var tMode = true; 		// Fahrenheit/Celcius Toggle
+var repeatTime = 60000; 	// Time between cloud updates
 
 
-
+// Update cloud weather state periodically
 setInterval(updateWeather, repeatTime);
 
 
 function handler(req, res) {
-    //console.log("Opening HTML File");
     fs.readFile(htmlPage, function(err, data) {
         if (err) {
             res.writeHead(500);
@@ -29,48 +29,56 @@ function handler(req, res) {
     });
 }
 
+/*
+* When socket is established, allow
+* for weather and temperature updates
+*/
 io.on('connection', function (socket) {
-  console.log("Connected");
-    
+    console.log("Connected");
     socket.on('LatLng', handleLatLng);
     socket.on('Btn', handleButton);
     soc = socket;
 });
 
-function updateWeather(){
-    if(currentWeather != 'Startup'){
-        //initial location exists
-        httpGetAsync(lastQuery);
-        
-        
-        
-        
-    }
-    
-    
-    
-    
+
+/*
+* This function is called periodically 
+* to update weather if the system
+* is not in the Startup state
+*/
+function updateWeather() {
+    if (currentWeather != 'Startup') {
+        // initial location exists
+        httpGetAsync(lastQuery);       
+    }    
 }
 
+// Button controller, called from btn emits
 function handleButton(message){
     console.log("Button Clicked");
     
-    if(message == 0){
-        console.log("Reset");
+    if (message == 0) {
+        //console.log("Reset");
+	// Disable periodic updates
         currentWeather = 'Startup';
     }
-    if(message == 1){
-        console.log("C/F");
+    if (message == 1) {
+        //console.log("C/F");
+	// Toggle Celcius/Fahrenheit
         tMode = !tMode;
     }
-    if(message == 2){
+    if (message == 2) {
+	//Intended to control if windspeed is tracked
         console.log("Windspeed");
     }
     
 }
 
-
-function handleLatLng(message){
+/*
+* Builds a query string and sends the request to 
+* httpGetAsync
+*/
+function handleLatLng(message) {
     //console.log("Latitude: " + message.lat + ", Longitutde: " + message.lng);
     console.log("Right Click Happened");
     var query = "http://api.wunderground.com/api/c9eca004c2ae9eb2/forecast/geolookup/conditions/q/";
@@ -79,8 +87,11 @@ function handleLatLng(message){
     httpGetAsync(query);
 }
 
-function httpGetAsync(theUrl)
-{
+/*
+* Send query to wundergroung and, once response is received,
+* send to handleWUResponse to update state
+*/
+function httpGetAsync(theUrl) {
     console.log("Requesting new data from WUnderground");
     
     var xmlHttp = new XMLHttpRequest();
@@ -92,19 +103,21 @@ function httpGetAsync(theUrl)
     xmlHttp.send(null);
 }
 
-
-function handleWUResponse(responseText){
+//update weather state with wunderground data
+function handleWUResponse(responseText) {
     //console.log("Handling WUnderground response");
     
     JSON.parse(responseText, function(property,value){
         //console.log(property + ": " + value);
-        if(property == "weather"){
+        if (property == "weather") {
             /*
             * Clear, Snow, Mostly Cloudy, Partly Cloudy, Rain, Light Rain
             * Thunderstorm, Scattered Clouds
             */
             console.log("W: " + value);
             var wVal = 0;
+	    
+	    // Demux weather into states for controlling LEDs
             switch(value){
                     case "Clear":
                     wVal = 0;
@@ -133,16 +146,18 @@ function handleWUResponse(responseText){
                     default:
                     wVal = -1;
             }
-            
+            // Change LED state
             updateWeatherLEDs(wVal);
-            
+            // Maintain weather state
             currentWeather = value;
         }
-        if(property == "temp_f" && tMode){
+	
+	//Based on tMode, display appropriate temperature
+        if (property == "temp_f" && tMode) {
             console.log("T: " + value);
             updateTemp(parseFloat(value));
         }
-        if(property == "temp_c" && !tMode){
+        if (property == "temp_c" && !tMode) {
             console.log("T: " + value);
             updateTemp(parseFloat(value));
         }
@@ -150,22 +165,25 @@ function handleWUResponse(responseText){
     
 }
 
-function updateWeatherLEDs(val){
-    if(val != -1){
+function updateWeatherLEDs(val) {
+    if (val != -1) {
         console.log("Found Matching Val");
-    console.log(val);
+    	console.log(val);
+	//This is where the LEDs would be controlled using val as the parameter
     }
     else{
+	//used to discover new weather types
         console.log("Unknown WeatherType found");
     }
     
 }
 
-function updateTemp(val){
-    if(val < -10){
+// Bound Temperature to -10 to 110 degrees
+function updateTemp(val) {
+    if (val < -10) {
         val = -10;
     }
-    if(val > 110){
+    if (val > 110) {
         val = 110;
     }
     console.log("Updating TempLEDS");

@@ -8,17 +8,21 @@ body {
 	padding:0;
 	height:100%;
 }
+
 #wrapper {
 	min-height:100%;
 	position:relative;
 }
+
 #header {
 	background:#ededed;
 	padding:10px;
 }
+
 #content {
 	padding-bottom:100px; /* Height of the footer element */
 }
+
 #footer {
 	background:#ffab62;
 	width:100%;
@@ -27,7 +31,6 @@ body {
 	bottom:0;
 	left:0;
 }
-
 
 #footer {
     position: relative;
@@ -42,6 +45,7 @@ body {
     text-align:center;
     padding:5px;
 }
+
 #nav {
     line-height:30px;
     background-color:#95a5a6;
@@ -50,20 +54,20 @@ body {
     float:left;
     padding:5px; 
 }
+
 #section {
     
     width:70%;
     float:left;
     padding:10px; 
 }
+
 #footer {
     background-color:#7f8c8d;
     color:white;
     clear:both;
     text-align:center;
 }
-
-
 
 </style>
 
@@ -114,20 +118,18 @@ body {
       console.log("Emmiting Reset");
       socket.emit('Btn', 0);
   }
+
   function cf(){
       console.log("Emmiting Change Temp");
       socket.emit('Btn', 1);
   }
+
   function wind(){
       console.log("Emmiting Wind");
       socket.emit('Btn', 2);
   }
 
-
-  
-  
-  
-  function initMap() {
+ function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
       center: {lat: 36.0, lng: -100},
       zoom: 4,
@@ -153,8 +155,6 @@ body {
 </script>
 
 </Body>
-
-
 
 
 </HTML>
